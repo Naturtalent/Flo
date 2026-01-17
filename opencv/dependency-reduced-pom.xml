@@ -10,33 +10,11 @@
     <finalName>opencv</finalName>
     <plugins>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.6.0</version>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>${main.class}</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.1</version>
         <executions>
           <execution>
+            <id>flothari.regal</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
@@ -44,12 +22,24 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>de.flothari.opencv.App</mainClass>
+                  <mainClass>de.flothari.regal.PiCamLivePreview</mainClass>
                 </transformer>
               </transformers>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <mainClass>FormIdentifierLoop</mainClass>
+        </configuration>
       </plugin>
     </plugins>
   </build>

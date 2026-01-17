@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.flothari</groupId>
+  <artifactId>flo-opencv</artifactId>
+  <version>1.0.0</version>
+
+  <properties>
+  
+    <maven.compiler.release>21.0.9</maven.compiler.release>
+
+        <!-- JavaCV / OpenCV Versions (müssen zueinander passen) -->
+    <javacv.version>1.5.10</javacv.version>
+    <opencv.version>4.9.0-1.5.10</opencv.version>
+
+    <!-- wird durch Profile gesetzt -->
+    <bytedeco.classifier>linux-armhf</bytedeco.classifier>
+     
+    <!-- deine Startklassen -->
+    <main.a>de.flothari.opencv.App</main.a>
+    <main.b>de.flothari.regal.FormIdentifierLoop</main.b>
+  </properties>
+  
+  
+
+  <dependencies>  
+  
+   <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.7.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.7.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+<!-- JavaCV API (OHNE -platform!) -->
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacv</artifactId>
+      <version>${javacv.version}</version>
+    </dependency>
+
+    <!-- OpenCV Java API (OHNE -platform!) -->
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>opencv-platform</artifactId>
+      <version>${opencv.version}</version>
+    </dependency>
+
+    <!-- OpenCV natives: NUR für die Zielplattform --> 
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>opencv-platform</artifactId>
+      <version>${opencv.version}</version>
+      <classifier>${bytedeco.classifier}</classifier>
+      <scope>runtime</scope>
+    </dependency>
+   
+
+    <!-- (Optional) JavaCPP presets natives; meist wird das transitiv sauber gezogen,
+         aber falls dir zur Laufzeit etwas fehlt, kannst du das ergänzen:
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacpp</artifactId>
+      <version>1.5.10</version>
+      <classifier>${bytedeco.classifier}</classifier>
+      <scope>runtime</scope>
+    </dependency>
+    -->
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        
+      
+        <configuration>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+     
+  
+        
+      </plugin>
+
+      <!-- 2 kleine ("thin") jars mit 2 unterschiedlichen Main-Classes -->
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <executions>
+
+          <execution>
+            <id>jar-a</id>
+            <phase>package</phase>
+            <goals><goal>jar</goal></goals>
+            <configuration>
+              <classifier>paket-a</classifier>
+              <archive>
+                <manifest>
+                  <mainClass>${main.a}</mainClass>
+                  <addClasspath>true</addClasspath>
+                  <classpathPrefix>lib/</classpathPrefix>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>jar-b</id>
+            <phase>package</phase>
+            <goals><goal>jar</goal></goals>
+            <configuration>
+              <classifier>paket-b</classifier>
+              <archive>
+                <manifest>
+                  <mainClass>${main.b}</mainClass>
+                  <addClasspath>true</addClasspath>
+                  <classpathPrefix>lib/</classpathPrefix>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <!-- kopiert alle runtime deps nach target/lib -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>copy-runtime-deps</id>
+            <phase>package</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- Profile: wähle armhf (32-bit) oder arm64 (64-bit) -->
+  <profiles>
+    <!-- Standard: 32-bit Raspi OS -->
+    <profile>
+      <id>raspi-armhf</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <bytedeco.classifier>linux-armhf</bytedeco.classifier>
+      </properties>
+    </profile>
+
+    <!-- falls dein Raspi OS 64-bit ist -->
+    <profile>
+      <id>raspi-arm64</id>
+      <properties>
+        <bytedeco.classifier>linux-arm64</bytedeco.classifier>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>
+

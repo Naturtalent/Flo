@@ -1,53 +1,50 @@
 package de.flothari.regal;
 
-import org.bytedeco.opencv.opencv_core.*;
-import org.bytedeco.opencv.opencv_features2d.BFMatcher;
-import org.bytedeco.opencv.opencv_core.DMatch;
-import org.bytedeco.opencv.opencv_core.DMatchVector;
-import org.bytedeco.opencv.opencv_core.DMatchVectorVector;
-import org.bytedeco.opencv.opencv_features2d.ORB;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.DMatch;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.features2d.BFMatcher;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.ORB;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.bytedeco.opencv.global.opencv_core.NORM_HAMMING;
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
-import static org.bytedeco.opencv.global.opencv_imgproc.COLOR_BGR2GRAY;
-import static org.bytedeco.opencv.global.opencv_imgproc.cvtColor;
 
 public class FormIdentifierLoop
 {
 
-	// *** Pfade anpassen ***
-	//private static final String REF_FOLDER = "/home/pi/ref_bilder";
-	//private static final String CAPTURE_PATH = "/home/pi/captures/capture.jpg";
-	
-	private static final String REF_FOLDER = "/home/dieter/MeineDaten/Flo/Regalsystem/opencv/refimg";
-	private static final String CAPTURE_PATH = "/home/dieter/MeineDaten/Flo/Regalsystem/opencv/capture.jpg";
+	// Dateinamen/Ordner relativ zum Arbeitsverzeichnis (== Verzeichnis, wo du
+	// startest)
+	private static final String CAPTURE_FILENAME = "capture.jpg";
+	private static final String REF_FOLDER_NAME = "ref_bilder";
 
+	// Kamera-Aufnahme (rpicam)
+	private static final String CAPTURE_CMD_TEMPLATE = "rpicam-still --nopreview --width 640 --height 480 --timeout 500 -o \"%s\"";
 
-	// libcamera-Befehl für Foto
-	private static final String CAPTURE_CMD = "libcamera-still -n -o " + CAPTURE_PATH + " --width 640 --height 480";
-
-	// Minimaler Match-Score, sonst "UNBEKANNT"
-	private static final double MIN_SCORE_THRESHOLD = 0.05;
+	// Matching-Parameter
+	private static final double LOWE_RATIO = 0.75;
+	private static final double MIN_SCORE_THRESHOLD = 0.05; // ggf. feinjustieren
 
 	private static class RefImage
 	{
-		String shelfCode; // z.B. "A-21-G"
-		Mat imageGray; // Graustufenbild
-		KeyPointVector keypoints;
-		Mat descriptors;
+		final String shelfCode; // Dateiname ohne Extension
+		final Mat descriptors; // ORB Descriptors (CV_8U)
+		final int descriptorRows; // zur schnellen Auswertung
 
-		RefImage(String shelfCode, Mat imageGray, KeyPointVector keypoints, Mat descriptors)
+		RefImage(String shelfCode, Mat descriptors)
 		{
 			this.shelfCode = shelfCode;
-			this.imageGray = imageGray;
-			this.keypoints = keypoints;
 			this.descriptors = descriptors;
+			this.descriptorRows = descriptors.rows();
 		}
 	}
 
@@ -55,60 +52,82 @@ public class FormIdentifierLoop
 	private final BFMatcher matcher;
 	private final List<RefImage> referenceImages = new ArrayList<>();
 
+	private final String baseDir;
+	private final String refFolder;
+	private final String capturePath;
+	private final String captureCmd;
+
 	public FormIdentifierLoop()
 	{
-		// Wichtig: ohne Parameter, damit keine create(int)-Fehlermeldung
-		this.orb = ORB.create();
-		this.matcher = new BFMatcher(NORM_HAMMING, false);
+		// Native OpenCV laden:
+		// Option A: loadLibrary (benötigt java.library.path passend)
+		System.loadLibrary("opencv_java460");
+
+		// Arbeitsverzeichnis (dort liegt dein jar / oder du startest dort)
+		this.baseDir = new File(System.getProperty("user.dir")).getAbsolutePath();
+		this.refFolder = new File(baseDir, REF_FOLDER_NAME).getAbsolutePath();
+		this.capturePath = new File(baseDir, CAPTURE_FILENAME).getAbsolutePath();
+		this.captureCmd = String.format(CAPTURE_CMD_TEMPLATE, this.capturePath);
+
+		// ORB + Matcher
+		this.orb = ORB.create(); // Standardwerte
+		this.matcher = BFMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING, false);
 	}
 
-	// Referenzbilder aus Ordner laden
-	public void loadReferenceImages(String folderPath)
+	public void loadReferenceImages()
 	{
-		File folder = new File(folderPath);
+		File folder = new File(refFolder);
 		if (!folder.exists() || !folder.isDirectory())
 		{
-			throw new IllegalArgumentException("Referenzordner existiert nicht: " + folderPath);
+			throw new IllegalArgumentException("Referenzordner existiert nicht: " + refFolder);
 		}
 
-		File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg")
-				|| name.toLowerCase().endsWith(".jpeg") || name.toLowerCase().endsWith(".png"));
+		File[] files = folder.listFiles((dir, name) ->
+		{
+			String n = name.toLowerCase();
+			return n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".png");
+		});
 
 		if (files == null || files.length == 0)
 		{
-			throw new IllegalStateException("Keine Referenzbilder im Ordner gefunden: " + folderPath);
+			throw new IllegalStateException("Keine Referenzbilder im Ordner gefunden: " + refFolder);
 		}
 
-		System.out.println("Lade Referenzbilder aus: " + folderPath);
+		System.out.println("Arbeitsverzeichnis: " + baseDir);
+		System.out.println("Referenzordner:      " + refFolder);
+		System.out.println("Capture-Datei:       " + capturePath);
+		System.out.println();
+		System.out.println("Lade Referenzbilder...");
 
 		for (File f : files)
 		{
-			Mat img = imread(f.getAbsolutePath());
-			if (img == null || img.empty())
+			Mat img = Imgcodecs.imread(f.getAbsolutePath(), Imgcodecs.IMREAD_COLOR);
+			if (img.empty())
 			{
 				System.err.println("Konnte Bild nicht laden: " + f.getAbsolutePath());
 				continue;
 			}
 
 			Mat gray = new Mat();
-			cvtColor(img, gray, COLOR_BGR2GRAY);
+			Imgproc.cvtColor(img, gray, Imgproc.COLOR_BGR2GRAY);
 
-			KeyPointVector keypoints = new KeyPointVector();
+			MatOfKeyPoint keypoints = new MatOfKeyPoint();
 			Mat descriptors = new Mat();
 			orb.detectAndCompute(gray, new Mat(), keypoints, descriptors);
 
-			if (descriptors == null || descriptors.empty())
+			if (descriptors.empty() || descriptors.type() != CvType.CV_8U)
 			{
-				System.err.println("Keine Deskriptoren gefunden bei: " + f.getName());
+				System.err.println("Keine gültigen ORB-Deskriptoren bei: " + f.getName());
 				continue;
 			}
 
 			String fileName = f.getName();
-			int dotIndex = fileName.lastIndexOf('.');
-			String shelfCode = (dotIndex > 0) ? fileName.substring(0, dotIndex) : fileName;
+			int dot = fileName.lastIndexOf('.');
+			String shelfCode = (dot > 0) ? fileName.substring(0, dot) : fileName;
 
-			referenceImages.add(new RefImage(shelfCode, gray, keypoints, descriptors));
-			System.out.println("Geladen: " + shelfCode + " mit " + keypoints.size() + " Keypoints");
+			referenceImages.add(new RefImage(shelfCode, descriptors));
+			System.out.println("Geladen: " + shelfCode + " | Keypoints: " + keypoints.rows() + " | Descriptors: "
+					+ descriptors.rows());
 		}
 
 		if (referenceImages.isEmpty())
@@ -116,28 +135,70 @@ public class FormIdentifierLoop
 			throw new IllegalStateException("Es wurden keine gültigen Referenzbilder geladen.");
 		}
 
-		System.out.println("Fertig. Anzahl Referenzbilder: " + referenceImages.size());
+		System.out.println("Fertig. Anzahl Referenzen: " + referenceImages.size());
+		System.out.println();
 	}
 
-	// Ein neues Bild erkennen (Pfad zum aufgenommenen Bild)
-	public String identifyForm(String capturedImagePath)
+	public boolean captureImage()
 	{
-		Mat img = imread(capturedImagePath);
-		if (img == null || img.empty())
+		try
 		{
-			throw new IllegalArgumentException("Konnte aufgenommenes Bild nicht laden: " + capturedImagePath);
+			System.out.println("Mache Foto...");
+			ProcessBuilder pb = new ProcessBuilder("bash", "-c", captureCmd);
+			pb.redirectErrorStream(true);
+			Process p = pb.start();
+
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream())))
+			{
+				String line;
+				while ((line = br.readLine()) != null)
+				{
+					// optional: auskommentieren, wenn zu viel
+					// System.out.println("[rpicam] " + line);
+				}
+			}
+
+			int exit = p.waitFor();
+			if (exit != 0)
+			{
+				System.err.println("rpicam-still Fehlercode: " + exit);
+				return false;
+			}
+
+			if (!Files.exists(new File(capturePath).toPath()))
+			{
+				System.err.println("Capture-Datei nicht gefunden: " + capturePath);
+				return false;
+			}
+
+			System.out.println("Foto gespeichert: " + capturePath);
+			return true;
+		} catch (Exception e)
+		{
+			System.err.println("Fehler bei Aufnahme: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public String identifyCaptured()
+	{
+		Mat img = Imgcodecs.imread(capturePath, Imgcodecs.IMREAD_COLOR);
+		if (img.empty())
+		{
+			throw new IllegalArgumentException("Konnte aufgenommenes Bild nicht laden: " + capturePath);
 		}
 
 		Mat gray = new Mat();
-		cvtColor(img, gray, COLOR_BGR2GRAY);
+		Imgproc.cvtColor(img, gray, Imgproc.COLOR_BGR2GRAY);
 
-		KeyPointVector keypoints = new KeyPointVector();
+		MatOfKeyPoint keypoints = new MatOfKeyPoint();
 		Mat descriptors = new Mat();
 		orb.detectAndCompute(gray, new Mat(), keypoints, descriptors);
 
-		if (descriptors == null || descriptors.empty())
+		if (descriptors.empty())
 		{
-			throw new IllegalStateException("Keine Deskriptoren im aufgenommenen Bild gefunden.");
+			return "UNBEKANNT";
 		}
 
 		double bestScore = 0.0;
@@ -157,7 +218,7 @@ public class FormIdentifierLoop
 
 		if (bestShelf == null || bestScore < MIN_SCORE_THRESHOLD)
 		{
-			System.out.println("Kein ausreichend gutes Matching gefunden. BestScore: " + bestScore);
+			System.out.println("Kein ausreichend gutes Matching. BestScore=" + bestScore);
 			return "UNBEKANNT";
 		}
 
@@ -165,123 +226,76 @@ public class FormIdentifierLoop
 		return bestShelf;
 	}
 
-	// Matchscore mit knnMatch + Lowe-Ratio
-	private double computeMatchScore(Mat refDescriptors, Mat queryDescriptors)
+	private double computeMatchScore(Mat refDesc, Mat queryDesc)
 	{
-		DMatchVectorVector knnMatches = new DMatchVectorVector();
-		matcher.knnMatch(refDescriptors, queryDescriptors, knnMatches, 2); // k = 2
+		// knnMatch: für jedes ref-Feature die 2 besten Matches im Query
+		List<MatOfDMatch> knnMatches = new ArrayList<>();
+		matcher.knnMatch(refDesc, queryDesc, knnMatches, 2);
 
-		long totalMatches = knnMatches.size();
-		if (totalMatches == 0)
+		int total = knnMatches.size();
+		if (total == 0)
 			return 0.0;
 
-		int goodMatches = 0;
-		for (long i = 0; i < knnMatches.size(); i++)
+		int good = 0;
+		for (MatOfDMatch m : knnMatches)
 		{
-			DMatchVector mv = knnMatches.get(i);
-			if (mv.size() < 2)
+			DMatch[] d = m.toArray();
+			if (d.length < 2)
 				continue;
 
-			DMatch m1 = mv.get(0);
-			DMatch m2 = mv.get(1);
-
-			if (m1.distance() < 0.75 * m2.distance())
-			{ // Lowe-Ratio
-				goodMatches++;
+			if (d[0].distance < LOWE_RATIO * d[1].distance)
+			{
+				good++;
 			}
 		}
 
-		return (double) goodMatches / (double) totalMatches;
+		return (double) good / (double) total;
 	}
 
-	// Ein Foto mit libcamera-still aufnehmen
-	private static boolean captureImage()
-	{
-		try
-		{
-			System.out.println("Mache Foto mit Kamera...");
-			ProcessBuilder pb = new ProcessBuilder("bash", "-c", CAPTURE_CMD);
-			pb.redirectErrorStream(true);
-			Process process = pb.start();
-
-			// Konsolenausgabe von libcamera mitlesen (optional)
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream())))
-			{
-				String line;
-				while ((line = reader.readLine()) != null)
-				{
-					System.out.println("[libcamera] " + line);
-				}
-			}
-
-			int exitCode = process.waitFor();
-			if (exitCode != 0)
-			{
-				System.err.println("libcamera-still beendete sich mit Fehlercode: " + exitCode);
-				return false;
-			}
-
-			File f = new File(CAPTURE_PATH);
-			if (!f.exists())
-			{
-				System.err.println("Aufgenommenes Bild nicht gefunden: " + CAPTURE_PATH);
-				return false;
-			}
-
-			System.out.println("Foto aufgenommen: " + CAPTURE_PATH);
-			return true;
-		} catch (Exception e)
-		{
-			System.err.println("Fehler beim Aufnehmen des Bildes: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	// MAIN: Endlosschleife
 	public static void main(String[] args)
 	{
 		try
 		{
-			FormIdentifierLoop identifier = new FormIdentifierLoop();
-			identifier.loadReferenceImages(REF_FOLDER);
+			// Version ausgeben (hilft beim Debug)
+			System.out.println("OpenCV Version: " + Core.VERSION);
 
-			System.out.println();
-			System.out.println("Bereit.");
-			System.out.println("Enter drücken, um ein neues Foto zu machen und zu erkennen.");
-			System.out.println("'q' + Enter zum Beenden.");
+			FormIdentifierLoop app = new FormIdentifierLoop();
+			app.loadReferenceImages();
 
-			BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Bereit. Enter = Foto+Erkennung | q = Ende");
+			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
 			while (true)
 			{
 				System.out.print("> ");
-				String line = consoleReader.readLine();
+				String line = console.readLine();
 				if (line == null)
-					break; // EOF
+					break;
 				line = line.trim().toLowerCase();
 
 				if (line.equals("q") || line.equals("quit") || line.equals("exit"))
 				{
-					System.out.println("Beende Programm.");
+					System.out.println("Beende.");
 					break;
 				}
 
-				// Jede andere Eingabe (auch leere) startet eine Aufnahme
-				if (!captureImage())
+				if (!app.captureImage())
 				{
-					System.out.println("Aufnahme fehlgeschlagen. Nochmal versuchen?");
+					System.out.println("Aufnahme fehlgeschlagen.");
 					continue;
 				}
 
-				String shelfCode = identifier.identifyForm(CAPTURE_PATH);
-				System.out.println(">>> Erkannte Ablage: " + shelfCode);
+				String shelf = app.identifyCaptured();
+				System.out.println(">>> Erkannte Ablage: " + shelf);
 				System.out.println();
 			}
-
+		} catch (UnsatisfiedLinkError ule)
+		{
+			System.err.println("Native OpenCV Library konnte nicht geladen werden.");
+			System.err.println("Tipp: java -Djava.library.path=/usr/lib/jni -jar ...");
+			ule.printStackTrace();
 		} catch (Exception e)
 		{
-			System.err.println("Fehler im Programm: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

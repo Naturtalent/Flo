@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<artifacts size='1'>
+  <artifact classifier='osgi.bundle' id='de.flothari.ui' version='1.0.0.202601201652'>
+    <properties size='9'>
+      <property name='artifact.size' value='9944'/>
+      <property name='download.size' value='9944'/>
+      <property name='download.checksum.sha-512' value='abd2774ea3c0efc61e48f2ba2c97cca790a50e63c6ce671281d9581cf33031e174bb4bd5eedd2297ca003cfb0a344401496d58ad55e4e36884b31065612b880f'/>
+      <property name='download.checksum.sha-1' value='647aeec1a1b98e3670ead495e615537dc6ac240e'/>
+      <property name='download.checksum.sha-256' value='5eb2bfadde93cb47842b9c43dc13c9fda787c4fe13ac5133e9dfe12096ccc32a'/>
+      <property name='maven-groupId' value='com.vogella.tycho'/>
+      <property name='maven-artifactId' value='de.flothari.ui'/>
+      <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+      <property name='maven-type' value='eclipse-plugin'/>
+    </properties>
+  </artifact>
+</artifacts>

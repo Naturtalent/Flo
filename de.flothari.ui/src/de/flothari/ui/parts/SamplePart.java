@@ -30,7 +30,7 @@ public class SamplePart
 		parent.setLayout(new GridLayout(1, false));
 
 		TextFactory.newText(SWT.BORDER) //
-				.message("Enter text to mark part as dirty") //
+				.message("Einfügen eines textes to mark part as dirty") //
 				.onModify(e -> part.setDirty(true)) //
 				.layoutData(new GridData(GridData.FILL_HORIZONTAL))//
 				.create(parent);
@@ -40,6 +40,9 @@ public class SamplePart
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewer.setInput(createInitialDataModel());
 		tableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		//RegalPart test = new RegalPart();
+		//System.out.println("RegalPart geladen");
 	}
 
 	@Focus
@@ -56,6 +59,6 @@ public class SamplePart
 
 	private List<String> createInitialDataModel()
 	{
-		return Arrays.asList("Sample item 1", "Sample item 2", "Sample item 3", "Sample item 4", "Sample item 5");
+		return Arrays.asList("Sample item x", "Sample item 2", "Sample item 3", "Sample item 4", "Sample item 5");
 	}
 }

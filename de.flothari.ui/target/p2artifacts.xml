@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?artifactRepository version='1.1.0'?>
 <artifacts size='1'>
-  <artifact classifier='osgi.bundle' id='de.flothari.ui' version='1.0.0.202601201652'>
+  <artifact classifier='osgi.bundle' id='de.flothari.ui' version='1.0.0.202601221508'>
     <properties size='9'>
-      <property name='artifact.size' value='9944'/>
-      <property name='download.size' value='9944'/>
-      <property name='download.checksum.sha-512' value='abd2774ea3c0efc61e48f2ba2c97cca790a50e63c6ce671281d9581cf33031e174bb4bd5eedd2297ca003cfb0a344401496d58ad55e4e36884b31065612b880f'/>
-      <property name='download.checksum.sha-1' value='647aeec1a1b98e3670ead495e615537dc6ac240e'/>
-      <property name='download.checksum.sha-256' value='5eb2bfadde93cb47842b9c43dc13c9fda787c4fe13ac5133e9dfe12096ccc32a'/>
+      <property name='artifact.size' value='16489'/>
+      <property name='download.size' value='16489'/>
+      <property name='download.checksum.sha-512' value='aa456dfeddab5f718656f64fe904403c2c29feabe8c9ead1be9577e1d7fbf06d1e5744d1d65c439243af7f6f4576eea90b366706cc67bee483cbc5f1cbfd6bc0'/>
+      <property name='download.checksum.sha-1' value='6147633e64bdb2421170f3bcb237fc161dcaab57'/>
+      <property name='download.checksum.sha-256' value='cd0c05a1d920743e40bf072a45c51263aa1bca1800086bcc2231e55bbc8bb1fe'/>
       <property name='maven-groupId' value='com.vogella.tycho'/>
       <property name='maven-artifactId' value='de.flothari.ui'/>
       <property name='maven-version' value='1.0.0-SNAPSHOT'/>

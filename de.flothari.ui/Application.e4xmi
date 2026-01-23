@@ -3,14 +3,20 @@
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.window.main" label="Eclipse RCP Application" width="500" height="400">
     <children xsi:type="basic:PartSashContainer" xmi:id="_6wlLksgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.partsashcontainer.sample">
       <children xsi:type="basic:PartStack" xmi:id="_6wlLk8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.partstack.sample">
-        <children xsi:type="basic:Part" xmi:id="_6wlLlMgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.part.sample" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.parts.SamplePart" label="Sample Part" iconURI="platform:/plugin/de.flothari.ui/icons/home.svg"/>
+        <children xsi:type="basic:Part" xmi:id="_4hBGoPcFEfCoP_Yg6f3X0w" elementId="de.flothari.ui.part.regal" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.parts.RegalPart" label="Regalsystem" iconURI="platform:/plugin/de.flothari.ui/icons/home.svg" tooltip="Regalsystem bearbeiten"/>
       </children>
     </children>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="file" label="File">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLi8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.file.open" label="Open" iconURI="platform:/plugin/de.flothari.ui/icons/open_in_app.svg" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjMgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.save" label="Save" iconURI="platform:/plugin/de.flothari.ui/icons/save_edit.svg" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_shoTwPcWEfCoP_Yg6f3X0w" elementId="de.flothari.ui.handledmenuitem.startVlc" label="Start VLC" iconURI="platform:/plugin/de.flothari.ui/icons/menu/vlc_menu_16x16_3d.png" command="_ezGrEPcSEfCoP_Yg6f3X0w"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjcgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.quit" label="Quit" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
+      </children>
+      <children xsi:type="menu:Menu" xmi:id="_63DysPeOEfCE2eufBjfEuQ" elementId="de.flothari.ui.menu.camera" label="Kamera">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_IBlTQPePEfCE2eufBjfEuQ" elementId="de.flothari.ui.handledmenuitem.vlccamera" label="Start VLCKamera" command="_VhdYwPePEfCE2eufBjfEuQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_QVXWcPfTEfCrmJwgF2GlFg" elementId="de.flothari.ui.handledmenuitem.snapshotvlccamera" label="Schnappschuss VLCKamera" command="_dWGo4PfTEfCrmJwgF2GlFg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_u7Th0PfPEfCrmJwgF2GlFg" elementId="de.flothari.ui.handledmenuitem.quitvlccamera" label="Stop VLCKamera" tooltip="VLC Kamera stoppen" command="_yhDV8PfOEfCrmJwgF2GlFg"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="help" label="Help">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
@@ -27,6 +33,10 @@
   <handlers xmi:id="_6wlLgcgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handler.openCommand" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.OpenHandler" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
   <handlers xmi:id="_6wlLhMgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handler.saveCommand" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.SaveHandler" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
   <handlers xmi:id="_6wlLh8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handler.aboutCommand" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.AboutHandler" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+  <handlers xmi:id="_mlJaIPcJEfCoP_Yg6f3X0w" elementId="de.flothari.ui.handler.startVlc" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StartVlcHandler" command="_ezGrEPcSEfCoP_Yg6f3X0w"/>
+  <handlers xmi:id="_rqivwPePEfCE2eufBjfEuQ" elementId="de.flothari.ui.handler.startvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StartVlcCameraHandler" command="_VhdYwPePEfCE2eufBjfEuQ"/>
+  <handlers xmi:id="_9o_TsPfOEfCrmJwgF2GlFg" elementId="de.flothari.ui.handler.quitvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.VlcQuitHandler" command="_yhDV8PfOEfCrmJwgF2GlFg"/>
+  <handlers xmi:id="_9rv8sPfiEfCrmJwgF2GlFg" elementId="de.flothari.ui.handler.snapshotvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.VlcSnapshotHandler" command="_dWGo4PfTEfCrmJwgF2GlFg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -41,6 +51,10 @@
   <commands xmi:id="_6wlLgMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.open" commandName="openCommand"/>
   <commands xmi:id="_6wlLg8gZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.save" commandName="saveCommand"/>
   <commands xmi:id="_6wlLhsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
+  <commands xmi:id="_ezGrEPcSEfCoP_Yg6f3X0w" elementId="de.flothari.ui.command.vlcstartcommand" commandName="vlcStartCommand"/>
+  <commands xmi:id="_VhdYwPePEfCE2eufBjfEuQ" elementId="de.flothari.ui.command.startvlccamera" commandName="startVlcCommand"/>
+  <commands xmi:id="_yhDV8PfOEfCrmJwgF2GlFg" elementId="de.flothari.ui.command.quitvlccamera" commandName="quitVlcCommand"/>
+  <commands xmi:id="_dWGo4PfTEfCrmJwgF2GlFg" elementId="de.flothari.ui.command.snapshotvlccamera" commandName="snapshotVlcCommand"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

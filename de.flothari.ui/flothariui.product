@@ -7,19 +7,26 @@
    </configIni>
 
    <launcherArgs>
+      <programArgs>-clearPersistedState
+      </programArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
 
+   <launcher>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
    <plugins>
       <plugin id="de.flothari.ui"/>
    </plugins>
-
-   <features>
-      <feature id="org.eclipse.e4.rcp" installMode="root"/>
-   </features>
 
 
 </product>

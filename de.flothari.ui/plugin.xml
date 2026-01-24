@@ -16,51 +16,12 @@
                name="appName"
                value="de.flothari.ui">
          </property>
-      </product>
-   </extension>
-   <extension
-         id="flothari"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.eclipse.e4.ui.workbench.swt.E4Application"
-            name="de.flothari.ui">
          <property
-               name="appName"
-               value="de.flothari.ui">
+               name="lifeCycleURI"
+               value="bundleclass://de.flothari.ui/de.flothari.ui.lifecycle.LifeCycle">
          </property>
       </product>
    </extension>
-   <extension
-         id="flothariui"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.eclipse.e4.ui.workbench.swt.E4Application"
-            name="Fothari UI">
-         <property
-               name="appName"
-               value="Fothari UI">
-         </property>
-      </product>
-   </extension>
-   <extension
-         id="floui"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.eclipse.ant.core.antRunner"
-            name="Flothari UI">
-      </product>
-   </extension>
-   <extension
-         id="flo"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.eclipse.e4.ui.workbench.swt.E4Application"
-            name="Flothari UI">
-         <property
-               name="appName"
-               value="Flothari UI">
-         </property>
-      </product>
-   </extension>
+
 
 </plugin>

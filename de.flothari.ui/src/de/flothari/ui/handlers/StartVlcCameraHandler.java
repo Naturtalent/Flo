@@ -1,31 +1,25 @@
 package de.flothari.ui.handlers;
 
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Execute;
-import de.flothari.ui.vlc.VlcController;
 import jakarta.inject.Inject;
+import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Execute;
+import jakarta.inject.Named;
 
-public class StartVlcCameraHandler
-{
+import de.flothari.ui.vlc.VlcService;
 
-	// In echt würdest du das als Singleton/Service halten.
-	// Fürs Beispiel: statisch.
-	private static final VlcController VLC = new VlcController("127.0.0.1", 4212);
+import static de.flothari.ui.lifecycle.LifeCycle.CTX_VLC_RUNNING;
 
-	@Inject
-	private IEclipseContext context;
+public class StartVlcCameraHandler {
 
-	@Execute
-	public void execute() throws Exception
-	{
-		VLC.startCamera();
-		
-		// 🔁 Enablement neu bewerten
-        context.set(VlcController.class, VLC);
-	}
+    @Inject private VlcService vlc;
 
-	public static VlcController getVlc()
-	{
-		return VLC;
-	}
+    @Execute
+    public void execute() throws Exception {
+        vlc.startCamera();
+    }
+
+    @CanExecute
+    public boolean canExecute(@Named(CTX_VLC_RUNNING) Boolean running) {
+        return running == null || !running.booleanValue();
+    }
 }

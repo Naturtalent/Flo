@@ -1,110 +1,98 @@
 package de.flothari.ui.vlc;
 
-import java.io.*;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import static de.flothari.ui.lifecycle.LifeCycle.CTX_VLC_RUNNING;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
-import java.time.Instant;
-import java.time.Duration;
 
-@Deprecated
-/* statt VlcController wird jetzt VlcService benutzt */
-public class VlcController
+import jakarta.annotation.PreDestroy;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Creatable;
+import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.core.services.events.IEventBroker;
+
+@Creatable
+@Singleton
+public class VlcService
 {
 
-	private final String host;
-	private final int port;
+	private final String host = "127.0.0.1";
+	private final int port = 4212;
+
 	private Process vlcProcess;
 
-	public VlcController(String host, int port)
+	@Inject
+	private IEclipseContext context;
+	@Inject
+	private IEventBroker eventBroker;
+	// @Inject
+	// private IWorkbench workbench; // optional, nur falls du später UI-Zugriff
+	// brauchst
+
+	public boolean isRunning()
 	{
-		this.host = host;
-		this.port = port;
+		return vlcProcess != null && vlcProcess.isAlive();
 	}
 
-	/** Startet VLC extern + öffnet nach Möglichkeit die USB-Kamera. */
 	public void startCamera() throws IOException
 	{
 		if (isRunning())
-		{
-			return; // schon gestartet
-		}
+			return;
 
 		String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-
-		// VLC executable: wenn nicht im PATH, hier absolute Pfade setzen
 		String vlcExe = resolveVlcExecutable(os);
 
-		// Snapshot-Zielordner
-		//Path snapshotDir = Paths.get(System.getProperty("user.home"), "vlc-snapshots");
-		Path snapshotDir = Paths.get(System.getProperty("user.dir"));
+		// App-Verzeichnis (dort liegt später capture.png)
+		Path appDir = Paths.get(System.getProperty("user.dir"));
 
-		Files.createDirectories(snapshotDir);
-		
 		List<String> cmd = new ArrayList<>();
 		cmd.add(vlcExe);
 
-		// Quelle (Kamera) OS-abhängig
 		if (os.contains("win"))
 		{
-			// Windows: DirectShow. Oft reicht dshow:// und VLC nimmt Default-Devices.
-			// Falls es nicht klappt: dshow-vdev explizit setzen (siehe weiter unten).
 			cmd.add("dshow://");
+			// Optional, falls Default-Device nicht passt:
+			// cmd.add(":dshow-vdev=USB Camera");
 		} else
 		{
-			// Linux: v4l2 device
 			cmd.add("v4l2:///dev/video0");
 		}
 
-		
-		
-		// RC-Interface via TCP-Socket
+		// RC Interface
 		cmd.add("--extraintf");
 		cmd.add("rc");
 		cmd.add("--rc-host");
 		cmd.add(host + ":" + port);
 
-		// Snapshot-Settings
-		cmd.add("--snapshot-path=" + snapshotDir.toAbsolutePath());		
+		// Snapshot-Settings (VLC erzeugt capture<suffix>.png; wir benennen danach um)
+		cmd.add("--snapshot-path=" + appDir.toAbsolutePath());
 		cmd.add("--snapshot-prefix=capture");
 		cmd.add("--snapshot-format=png");
-		cmd.add("--no-snapshot-sequential");  // verhindert die laufende Incrementierung
-
-		// Optional: Fenster direkt anzeigen, Audio stummschalten etc.
-		// cmd.add("--no-audio");
-
-		// Optional: Titel / UI-Einstellungen
-		// cmd.add("--video-title=Regalsystem Kamera");
 
 		ProcessBuilder pb = new ProcessBuilder(cmd);
 		pb.redirectErrorStream(true);
 		vlcProcess = pb.start();
 
-		// Optional: Output lesen (Debug)
-		// new Thread(() -> drain(vlcProcess.getInputStream())).start();
+		setRunning(true);
 	}
 
-	/** Löst einen Snapshot in VLC aus (speichert im snapshot-path). */
-	public void snapshot() throws IOException
-	{
-		// VLC RC: "snapshot" triggert Speicherung im konfigurierten snapshot-path
-		sendRc("snapshot");
-	}
-
-	/** Stoppt die Wiedergabe. */
-	public void stop() throws IOException
-	{
-		sendRc("stop");
-	}
-
-	/** Beendet VLC sauber. */
 	public void quit() throws IOException
 	{
+		if (!isRunning())
+			return;
+
 		try
 		{
 			sendRc("quit");
@@ -115,21 +103,36 @@ public class VlcController
 				vlcProcess.destroy();
 				vlcProcess = null;
 			}
+			setRunning(false);
 		}
 	}
 
-	public boolean isRunning()
+	/**
+	 * Snapshot anstoßen (hier nur RC; Umbenennung zu capture.png machst du wie
+	 * besprochen danach).
+	 */
+	public void snapshot() throws IOException
 	{
-		return vlcProcess != null && vlcProcess.isAlive();
+		if (!isRunning())
+			return;
+		sendRc("snapshot");
 	}
 
-	// ---------------- intern ----------------
+	// ---- intern ----
+
+	private void setRunning(boolean running)
+	{
+		context.set(CTX_VLC_RUNNING, Boolean.valueOf(running));
+
+		// e4 soll @CanExecute neu bewerten (Toolbar/Menu sofort aktualisieren)
+		eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+	}
 
 	private void sendRc(String command) throws IOException
 	{
-		try (Socket socket = new Socket(host, port);
-				BufferedWriter out = new BufferedWriter(
-						new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)))
+		try (var socket = new java.net.Socket(host, port);
+				var out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(socket.getOutputStream(),
+						java.nio.charset.StandardCharsets.UTF_8)))
 		{
 			out.write(command);
 			out.write("\n");
@@ -139,50 +142,19 @@ public class VlcController
 
 	private String resolveVlcExecutable(String os)
 	{
-		// 1) PATH-Variante:
-		// Wenn "vlc" im PATH ist, reicht "vlc".
-		// 2) Sonst: hier typische Pfade ergänzen.
-
 		if (os.contains("win"))
 		{
-			// häufigster Pfad unter Windows:
-			Path p1 = Paths.get("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
-			Path p2 = Paths.get("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe");
-			if (Files.exists(p1))
+			var p1 = java.nio.file.Paths.get("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
+			var p2 = java.nio.file.Paths.get("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe");
+			if (java.nio.file.Files.exists(p1))
 				return p1.toString();
-			if (Files.exists(p2))
+			if (java.nio.file.Files.exists(p2))
 				return p2.toString();
-			return "vlc"; // fallback PATH
-		} else
-		{
-			// Linux: meist per Paketmanager vorhanden
 			return "vlc";
 		}
+		return "vlc";
 	}
 
-	@SuppressWarnings("unused")
-	private static void drain(InputStream in)
-	{
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)))
-		{
-			while (br.readLine() != null)
-			{
-				/* ignore */ }
-		} catch (IOException ignored)
-		{
-		}
-	}
-
-	/**
-	 * Optional: eigener Dateiname (wird nicht von VLC RC genutzt), nur als Helper
-	 * für dich.
-	 */
-	public static String timestampName()
-	{
-		return "vlc_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".png";
-	}
-	
-	
 	public void snapshotToCapturePng() throws IOException, InterruptedException
 	{
 		Path appDir = Paths.get(System.getProperty("user.dir"));
@@ -197,7 +169,7 @@ public class VlcController
 		// 3) Ziel überschreiben
 		Files.move(newest, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 	}
-	
+
 	private Path waitForNewestCapture(Path dir, Duration timeout) throws IOException, InterruptedException
 	{
 		Instant end = Instant.now().plus(timeout);
@@ -237,7 +209,7 @@ public class VlcController
 
 		throw new IOException("Kein neuer capture*.png Snapshot im Timeout gefunden in: " + dir);
 	}
-	
+
 	private Optional<Path> findNewestCaptureFile(Path dir) throws IOException
 	{
 		try (Stream<Path> s = Files.list(dir))
@@ -256,6 +228,25 @@ public class VlcController
 					return FileTime.fromMillis(0);
 				}
 			}));
+		}
+	}
+
+	@PreDestroy
+	public void shutdown()
+	{
+		if (isRunning())
+		{
+			try
+			{
+				quit(); // sauber beenden
+			} catch (Exception e)
+			{
+				// letztes Fallback – wir sind im Shutdown
+				if (vlcProcess != null)
+				{
+					vlcProcess.destroy();
+				}
+			}
 		}
 	}
 }

@@ -1,29 +1,25 @@
 package de.flothari.ui.handlers;
 
-import org.eclipse.e4.core.contexts.IEclipseContext;
+import jakarta.inject.Inject;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import jakarta.inject.Named;
 
-import de.flothari.ui.vlc.VlcController;
-import jakarta.inject.Inject;
+import de.flothari.ui.vlc.VlcService;
 
-public class VlcQuitHandler
-{
-	@Inject
-	private IEclipseContext context;
+import static de.flothari.ui.lifecycle.LifeCycle.CTX_VLC_RUNNING;
 
-	@Execute
-	public void execute() throws Exception
-	{
-		StartVlcCameraHandler.getVlc().quit();
+public class VlcQuitHandler {
 
-		// 🔁 Enablement neu bewerten
-		context.set(VlcController.class, null);
-	}
+    @Inject private VlcService vlc;
 
-	@CanExecute
-	public boolean canExecute()
-	{
-		return StartVlcCameraHandler.getVlc() != null && StartVlcCameraHandler.getVlc().isRunning();
-	}
+    @Execute
+    public void execute() throws Exception {
+        vlc.quit();
+    }
+
+    @CanExecute
+    public boolean canExecute(@Named(CTX_VLC_RUNNING) Boolean running) {
+        return running != null && running.booleanValue();
+    }
 }

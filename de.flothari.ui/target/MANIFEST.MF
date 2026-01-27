@@ -2,15 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
 Bundle-SymbolicName: de.flothari.ui;singleton:=true
-Bundle-Version: 1.0.0.202601221508
+Bundle-Version: 1.0.0.202601262118
 Require-Bundle: org.eclipse.swt,org.eclipse.e4.ui.model.workbench,org.ec
  lipse.jface,org.eclipse.e4.ui.services,org.eclipse.e4.ui.workbench,org.
  eclipse.e4.core.di,org.eclipse.e4.ui.di,org.eclipse.e4.core.contexts,or
  g.eclipse.core.runtime,org.eclipse.e4.core.commands;bundle-version="1.1
- .700"
+ .700",org.eclipse.e4.core.services;bundle-version="2.5.300"
 Import-Package: jakarta.annotation;version="[2.1.0,3.0.0)";resolution:=o
  ptional,jakarta.inject;version="[2.0.0,3.0.0)"
 Require-Capability: eclipse.swt;filter:="(image.format=svg)",osgi.ee;fil
  ter:="(&(osgi.ee=JavaSE)(version=21))"
 Automatic-Module-Name: de.flothari.ui
+Bundle-ClassPath: lib/opencv.jar,.
 

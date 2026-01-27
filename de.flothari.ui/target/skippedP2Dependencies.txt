@@ -1,3 +1,4 @@
+com.vogella.tycho:de.flothari.ui:eclipse-plugin:lib/opencv.jar @ /home/dieter/EclipseRemoteRepository/Flo/de.flothari.ui
 p2.eclipse.plugin:org.eclipse.core.commands.source:eclipse-plugin @ /home/dieter/.m2/repository/p2/osgi/bundle/org.eclipse.core.commands.source/3.12.500.v20251103-0733/org.eclipse.core.commands.source-3.12.500.v20251103-0733.jar
 p2.eclipse.plugin:org.eclipse.core.commands:eclipse-plugin @ /home/dieter/.m2/repository/p2/osgi/bundle/org.eclipse.core.commands/3.12.500.v20251103-0733/org.eclipse.core.commands-3.12.500.v20251103-0733.jar
 p2.eclipse.plugin:org.eclipse.core.contenttype.source:eclipse-plugin @ /home/dieter/.m2/repository/p2/osgi/bundle/org.eclipse.core.contenttype.source/3.9.800.v20251105-1620/org.eclipse.core.contenttype.source-3.9.800.v20251105-1620.jar

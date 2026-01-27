@@ -195,7 +195,7 @@ public class VlcController
 		Path newest = waitForNewestCapture(appDir, Duration.ofSeconds(2));
 
 		// 3) Ziel überschreiben
-		Files.move(newest, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+		Files.move(newest, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);		
 	}
 	
 	private Path waitForNewestCapture(Path dir, Duration timeout) throws IOException, InterruptedException

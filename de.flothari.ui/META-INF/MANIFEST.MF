@@ -19,3 +19,5 @@ Import-Package: jakarta.annotation;version="[2.1.0,3.0.0)";resolution:=optional,
  jakarta.inject;version="[2.0.0,3.0.0)"
 Require-Capability: eclipse.swt;filter:="(image.format=svg)"
 Automatic-Module-Name: de.flothari.ui
+Bundle-ClassPath: lib/opencv.jar,
+ .

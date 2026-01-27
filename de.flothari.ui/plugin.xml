@@ -7,18 +7,30 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.e4.ui.workbench.swt.E4Application"
-            name="de.flothari.ui">
+            name="Flothari UI">
          <property
                name="applicationCSS"
                value="platform:/plugin/de.flothari.ui/css/default.css">
          </property>
          <property
                name="appName"
-               value="de.flothari.ui">
+               value="Flothari UI">
          </property>
          <property
                name="lifeCycleURI"
                value="bundleclass://de.flothari.ui/de.flothari.ui.lifecycle.LifeCycle">
+         </property>
+      </product>
+   </extension>
+   <extension
+         id="flo"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.e4.ui.workbench.swt.E4Application"
+            name="Flothari UI">
+         <property
+               name="appName"
+               value="Flothari UI">
          </property>
       </product>
    </extension>

@@ -9,17 +9,26 @@ import de.flothari.ui.vlc.VlcService;
 
 import static de.flothari.ui.lifecycle.LifeCycle.CTX_VLC_RUNNING;
 
-public class StartVlcCameraHandler {
+/**
+ *  Startet vlc ueber den VlcServise
+ *  Vlc Service wird als single Instance vom context injeziert
+ */
+public class StartVlcCameraHandler
+{
 
-    @Inject private VlcService vlc;
+	@Inject
+	private VlcService vlc;
 
-    @Execute
-    public void execute() throws Exception {
-        vlc.startCamera();
-    }
+	@Execute
+	public void execute() throws Exception
+	{
+		vlc.startCamera();
+	}
 
-    @CanExecute
-    public boolean canExecute(@Named(CTX_VLC_RUNNING) Boolean running) {
-        return running == null || !running.booleanValue();
-    }
+	@CanExecute
+	public boolean canExecute(@Named(CTX_VLC_RUNNING) Boolean running)
+	{
+		return running == null || !running.booleanValue();
+	}
+
 }

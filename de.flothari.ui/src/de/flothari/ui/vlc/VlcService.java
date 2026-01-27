@@ -20,7 +20,9 @@ import jakarta.inject.Singleton;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.IWorkbench;
+
+import de.flothari.ui.settings.AppSettings;
+
 import org.eclipse.e4.core.services.events.IEventBroker;
 
 @Creatable
@@ -32,6 +34,8 @@ public class VlcService
 	private final int port = 4212;
 
 	private Process vlcProcess;
+	
+	private Path workDir;
 
 	@Inject
 	private IEclipseContext context;
@@ -55,20 +59,33 @@ public class VlcService
 		String vlcExe = resolveVlcExecutable(os);
 
 		// App-Verzeichnis (dort liegt später capture.png)
-		Path appDir = Paths.get(System.getProperty("user.dir"));
+		AppSettings s = new AppSettings();
+		workDir = s.getWorkDir();
+		String audioDev = new AppSettings().getAudioDeviceName();		
 
 		List<String> cmd = new ArrayList<>();
 		cmd.add(vlcExe);
 
+		//if (os.contains("win"))
+		//{
+		//	cmd.add("dshow://");
+			// Optional, falls Default-Device nicht passt:
+			// cmd.add(":dshow-vdev=USB Camera");
+		//} else
+		//{
+		//	cmd.add("v4l2:///dev/video2");
+		//}
+
 		if (os.contains("win"))
 		{
 			cmd.add("dshow://");
-			// Optional, falls Default-Device nicht passt:
-			// cmd.add(":dshow-vdev=USB Camera");
+			// unter Windows wird 'audioDev'
 		} else
 		{
-			cmd.add("v4l2:///dev/video0");
+			cmd.add("v4l2://"+audioDev);
 		}
+
+		
 
 		// RC Interface
 		cmd.add("--extraintf");
@@ -77,7 +94,7 @@ public class VlcService
 		cmd.add(host + ":" + port);
 
 		// Snapshot-Settings (VLC erzeugt capture<suffix>.png; wir benennen danach um)
-		cmd.add("--snapshot-path=" + appDir.toAbsolutePath());
+		cmd.add("--snapshot-path=" + workDir.toAbsolutePath());
 		cmd.add("--snapshot-prefix=capture");
 		cmd.add("--snapshot-format=png");
 
@@ -85,7 +102,23 @@ public class VlcService
 		pb.redirectErrorStream(true);
 		vlcProcess = pb.start();
 
+		registerExitWatcher();
+		
 		setRunning(true);
+	}
+	
+	// sichert enablement wenn vlc geschlossen wird
+	private void registerExitWatcher() {
+	    if (vlcProcess == null) return;
+
+	    vlcProcess.onExit().thenRun(() -> {
+	        // VLC ist beendet (normal/Crash/Fenster-X)
+	        vlcProcess = null;
+	        setRunning(false);
+
+	        // Optional: hier könntest du noch loggen, UI-Status setzen, etc.
+	        // Wichtig: keine Dialoge erzwingen beim Shutdown, aber Status/Enablement ist ok.
+	    });
 	}
 
 	public void quit() throws IOException
@@ -157,17 +190,18 @@ public class VlcService
 
 	public void snapshotToCapturePng() throws IOException, InterruptedException
 	{
-		Path appDir = Paths.get(System.getProperty("user.dir"));
-		Path target = appDir.resolve("capture.png");
+		//Path appDir = Paths.get(System.getProperty("user.dir"));
+		//Path target = appDir.resolve("capture.png");
+		Path target = workDir.resolve("capture.png");		
 
 		// 1) Snapshot anstoßen (VLC erzeugt capture<timestamp>.png)
 		sendRc("snapshot");
 
 		// 2) Kurz warten, bis Datei wirklich geschrieben ist (robust)
-		Path newest = waitForNewestCapture(appDir, Duration.ofSeconds(2));
+		Path newest = waitForNewestCapture(workDir, Duration.ofSeconds(2));
 
 		// 3) Ziel überschreiben
-		Files.move(newest, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+		Files.move(newest, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);		
 	}
 
 	private Path waitForNewestCapture(Path dir, Duration timeout) throws IOException, InterruptedException

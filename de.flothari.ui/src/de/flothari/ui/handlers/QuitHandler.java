@@ -12,7 +12,7 @@ public class QuitHandler {
 	public void execute(IWorkbench workbench, Shell shell) {
 
 		PlainMessageDialog dialog = PlainMessageDialog.getBuilder(shell, "Confirmation")
-				.message("Do you want to exit?").buttonLabels(List.of("Exit", "Cancel")).build();
+				.message("Programm wirklich beenden?").buttonLabels(List.of("Exit", "Cancel")).build();
 
 		if (dialog.open() == 0) {
 			workbench.close();

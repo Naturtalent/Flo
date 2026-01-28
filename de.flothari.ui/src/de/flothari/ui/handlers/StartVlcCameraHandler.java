@@ -10,7 +10,7 @@ import de.flothari.ui.vlc.VlcService;
 import static de.flothari.ui.lifecycle.LifeCycle.CTX_VLC_RUNNING;
 
 /**
- *  Startet vlc ueber den VlcServise
+ *  Startet vlc ueber den VlcService
  *  Vlc Service wird als single Instance vom context injeziert
  */
 public class StartVlcCameraHandler

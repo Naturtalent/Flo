@@ -4,6 +4,7 @@
     <children xsi:type="basic:PartSashContainer" xmi:id="_6wlLksgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.partsashcontainer.sample">
       <children xsi:type="basic:PartStack" xmi:id="_6wlLk8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.partstack.sample">
         <children xsi:type="basic:Part" xmi:id="_4fVVUPlaEfCLPenbmT055Q" elementId="de.flothari.ui.part.regalbearbeitung" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.parts.SamplePart" label="Regalbearbeitung"/>
+        <children xsi:type="basic:Part" xmi:id="_JGmDcPyFEfCXx4v5YDcEXA" elementId="de.flothari.ui.part.cameraLiveview" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.parts.CameraLivePart" label="Live View" tooltip="Die Raspi Kamera starten"/>
       </children>
     </children>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
@@ -28,9 +29,12 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLmMgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.trimbar.top.save" iconURI="platform:/plugin/de.flothari.ui/icons/save_edit.svg" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLl8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.handleditem.trimbar.top.open" iconURI="platform:/plugin/de.flothari.ui/icons/open_in_app.svg" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_taJ-IPn-EfCwSe38-GBItw" elementId="de.flothari.ui.toolbarseparator.0"/>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_D2PSUPr_EfCuOrscNAK3aQ" elementId="de.flothari.ui.handledtoolitem.vlcsnapshot" label="VLC Schnappschuss" iconURI="platform:/plugin/de.flothari.ui/icons/toolbar/snapshot.svg" command="_dWGo4PfTEfCrmJwgF2GlFg"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_D2PSUPr_EfCuOrscNAK3aQ" elementId="de.flothari.ui.handledtoolitem.vlcsnapshot" label="Schnappschuss" iconURI="" tooltip="einen Schnappschuss auslösen" command="_iDAlsPwtEfCv5sNZphUMDA"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_eKyRIPojEfCwSe38-GBItw" elementId="de.flothari.ui.handledtoolitem..saveref" label="SaveRef" iconURI="platform:/plugin/de.flothari.ui/icons/toolbar/saveRef.png" tooltip="Schnappschuss als Referenzbild speichern" command="_LJME8PoiEfCwSe38-GBItw"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_KtcFoPo5EfCwSe38-GBItw" elementId="de.flothari.ui.handledtoolitem.comprefsingle" label="comprefsingle" iconURI="platform:/plugin/de.flothari.ui/icons/toolbar/compRefSingle.png" tooltip="Bild mit Einzelform mit den Referenzbilder vergleichen" command="_UEETQPo4EfCwSe38-GBItw"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="_YKc7oPxuEfCXx4v5YDcEXA" elementId="de.flothari.ui.toolbarseparator.1"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_a0h8QPxuEfCXx4v5YDcEXA" elementId="de.flothari.ui.handledtoolitem.startlife" label="Start" iconURI="" tooltip="Start Raspi Kamera" command="_NDNW4PxtEfCXx4v5YDcEXA"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_dO4z8PxwEfCXx4v5YDcEXA" elementId="de.flothari.ui.handledtoolitem.stoplive" label="Stop" tooltip="Stop Raspi Kamera" command="_U6vT0PxtEfCXx4v5YDcEXA"/>
       </children>
     </trimBars>
   </children>
@@ -41,10 +45,13 @@
   <handlers xmi:id="_mlJaIPcJEfCoP_Yg6f3X0w" elementId="de.flothari.ui.handler.startVlc" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StartVlcHandler" command="_ezGrEPcSEfCoP_Yg6f3X0w"/>
   <handlers xmi:id="_rqivwPePEfCE2eufBjfEuQ" elementId="de.flothari.ui.handler.startvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StartVlcCameraHandler" command="_VhdYwPePEfCE2eufBjfEuQ"/>
   <handlers xmi:id="_9o_TsPfOEfCrmJwgF2GlFg" elementId="de.flothari.ui.handler.quitvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.VlcQuitHandler" command="_yhDV8PfOEfCrmJwgF2GlFg"/>
-  <handlers xmi:id="_9rv8sPfiEfCrmJwgF2GlFg" elementId="de.flothari.ui.handler.snapshotvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.VlcSnapshotHandler" command="_dWGo4PfTEfCrmJwgF2GlFg"/>
+  <handlers xmi:id="_9rv8sPfiEfCrmJwgF2GlFg" elementId="de.flothari.ui.handler.snapshotvlccamera" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.SnapshotHandler" command="_dWGo4PfTEfCrmJwgF2GlFg"/>
   <handlers xmi:id="_yTI78PoiEfCwSe38-GBItw" elementId="de.flothari.ui.handler..saveref" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.SaveCaptureAsReferenceHandler" command="_LJME8PoiEfCwSe38-GBItw"/>
-  <handlers xmi:id="_q9lBoPo4EfCwSe38-GBItw" elementId="de.flothari.ui.handler.comprefsingle" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.CompareCaptureWithReferencesHandler" command="_UEETQPo4EfCwSe38-GBItw"/>
+  <handlers xmi:id="_q9lBoPo4EfCwSe38-GBItw" elementId="de.flothari.ui.handler.comprefsingle" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.CompareHandler" command="_UEETQPo4EfCwSe38-GBItw"/>
   <handlers xmi:id="_-T_1kPqtEfCLj62yLbZUvA" elementId="de.flothari.ui.handler.settings" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.OpenSettingsHandler" command="_y0P0wPqtEfCLj62yLbZUvA"/>
+  <handlers xmi:id="_UpgYgPwuEfCv5sNZphUMDA" elementId="de.flothari.ui.handler.snapshot" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.SnapshotHandler" command="_iDAlsPwtEfCv5sNZphUMDA"/>
+  <handlers xmi:id="_1GuTIPxtEfCXx4v5YDcEXA" elementId="de.flothari.ui.handler.startlive" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StartLiveHandler" command="_NDNW4PxtEfCXx4v5YDcEXA"/>
+  <handlers xmi:id="_E1c10PxuEfCXx4v5YDcEXA" elementId="de.flothari.ui.handler.stoplive" contributionURI="bundleclass://de.flothari.ui/de.flothari.ui.handlers.StopLiveHandler" command="_U6vT0PxtEfCXx4v5YDcEXA"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="de.flothari.ui.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="de.flothari.ui.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -66,6 +73,9 @@
   <commands xmi:id="_LJME8PoiEfCwSe38-GBItw" elementId="de.flothari.ui.command.saveref" commandName="saveRefCommand" description="Neues Referenzbild"/>
   <commands xmi:id="_UEETQPo4EfCwSe38-GBItw" elementId="de.flothari.ui.command.comprefsingle" commandName="comprefsingle" description="capture einer Einzelform mit Referenzbilder vergleichen"/>
   <commands xmi:id="_y0P0wPqtEfCLj62yLbZUvA" elementId="de.flothari.ui.command.settings" commandName="settings" description="Einstellungen"/>
+  <commands xmi:id="_iDAlsPwtEfCv5sNZphUMDA" elementId="de.flothari.ui.command.snapshot" commandName="snapshot" description="Schnappschuss auslösen"/>
+  <commands xmi:id="_NDNW4PxtEfCXx4v5YDcEXA" elementId="de.flothari.ui.command.startlive" commandName="startlive" description="Start Raspi Live"/>
+  <commands xmi:id="_U6vT0PxtEfCXx4v5YDcEXA" elementId="de.flothari.ui.command.stoplive" commandName="stoplive" description="Stop Raspi Live"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

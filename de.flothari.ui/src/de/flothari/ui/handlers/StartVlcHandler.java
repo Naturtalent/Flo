@@ -13,6 +13,9 @@ public class StartVlcHandler
 	@Execute
 	public void execute(Shell shell)
 	{
+		
+		System.out.println("deprecated StartVlcHandler, de.flothari.ui.handler.startVlc, vlcStartCommand");
+		
 		String vlcCommand = getVlcCommand();
 
 		try

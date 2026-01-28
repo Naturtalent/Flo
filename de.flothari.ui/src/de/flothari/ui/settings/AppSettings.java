@@ -14,7 +14,10 @@ public class AppSettings {
 
     private static final String KEY_AUDIO_DEVICE_NAME = "vlc.audioDeviceName";
     private static final String KEY_WORK_DIR          = "app.workDir";
+    private static final String KEY_PI_BASE_URL = "pi.baseUrl";
+    private static final String KEY_CAMERA_SOURCE = "camera.source"; // "PI" oder "LOCAL"
 
+    
     private final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(NODE);
 
     public String getAudioDeviceName() {
@@ -46,5 +49,23 @@ public class AppSettings {
             // In der Praxis: loggen (Error Log), aber nicht die UI blockieren
             e.printStackTrace();
         }
+    }
+    
+    public String getPiBaseUrl() {
+        return prefs.get(KEY_PI_BASE_URL, "http://raspi-ip:8080");
+    }
+
+    public void setPiBaseUrl(String url) {
+        prefs.put(KEY_PI_BASE_URL, url != null ? url.trim() : "");
+        flushQuietly();
+    }
+    
+    public String getCameraSource() {
+        return prefs.get(KEY_CAMERA_SOURCE, "PI");
+    }
+
+    public void setCameraSource(String value) {
+        prefs.put(KEY_CAMERA_SOURCE, (value == null || value.isBlank()) ? "PI" : value.trim());
+        flushQuietly();
     }
 }

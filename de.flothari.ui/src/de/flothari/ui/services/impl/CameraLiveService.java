@@ -57,9 +57,10 @@ public class CameraLiveService
 		ensureOpenCvLoaded();
 		running.set(true);
 		
+		// informiert Enablement das der Stream laeuft
 		fireEnablementUpdate();
 
-		String device = new AppSettings().getAudioDeviceName(); // hier als Kamera-Device verwendet
+		String device = new AppSettings().getVideoDeviceName(); // hier als Kamera-Device verwendet
 		if (device == null || device.isBlank())
 		{
 			device = "/dev/video2"; // Default
@@ -77,6 +78,7 @@ public class CameraLiveService
 		if (!running.get()) return;
 		running.set(false);
 		
+		// informiert Enablement dass der Stream gestoppt hat
 		fireEnablementUpdate();   
 		
 		if (worker != null)

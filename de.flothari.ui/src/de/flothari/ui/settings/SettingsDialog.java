@@ -24,7 +24,7 @@ public class SettingsDialog extends TitleAreaDialog {
     public void create() {
         super.create();
         setTitle("Einstellungen");
-        setMessage("Audio-Gerätename (VLC) und Arbeitsverzeichnis festlegen. Änderungen werden gespeichert.");
+        setMessage("Video-Gerätename und Arbeitsverzeichnis festlegen. Änderungen werden gespeichert.");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SettingsDialog extends TitleAreaDialog {
         btnBrowse.addListener(SWT.Selection, e -> browseDir());
 
         // Werte vorbefüllen
-        txtAudio.setText(settings.getAudioDeviceName());
+        txtAudio.setText(settings.getVideoDeviceName());
         txtWorkDir.setText(settings.getWorkDir().toString());
 
         return area;
@@ -87,7 +87,7 @@ public class SettingsDialog extends TitleAreaDialog {
             return;
         }
 
-        settings.setAudioDeviceName(audio);
+        settings.setVideoDeviceName(audio);
         settings.setWorkDir(dir);
 
         super.okPressed();

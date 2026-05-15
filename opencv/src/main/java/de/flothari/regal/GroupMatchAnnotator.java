@@ -15,7 +15,7 @@ public class GroupMatchAnnotator
 {
 
 	private static final String REF_FOLDER_NAME = "ref_bilder";
-	private static final String CAPTURE_FILENAME = "capture.jpg";
+	private static final String CAPTURE_FILENAME = "capture.png";
 	private static final String OUTPUT_FILENAME = "annotated.jpg";
 
 	// --- Tuning für "wild gedreht" ---

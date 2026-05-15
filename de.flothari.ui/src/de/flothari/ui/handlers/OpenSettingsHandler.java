@@ -14,8 +14,6 @@ import de.flothari.ui.settings.SettingsDialog;
 public class OpenSettingsHandler {
 
     @Inject private UISynchronize ui;
-    @Inject private EPartService partService;
-
     @Execute
     public void execute() {
         ui.asyncExec(() -> {

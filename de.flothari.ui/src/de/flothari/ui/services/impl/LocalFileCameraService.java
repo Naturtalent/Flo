@@ -17,16 +17,23 @@ import de.flothari.ui.settings.AppSettings;
 public class LocalFileCameraService implements CameraService
 {
 
+	private static final List<String> CAPTURE_CANDIDATES = List.of("capture.png", "capture.jpg", "capture.jpeg");
+	
 	@Override
 	public Path capture() throws Exception
 	{
 		Path workDir = new AppSettings().getWorkDir();
-		for (String name : List.of("capture.png", "capture.jpg", "capture.jpeg"))
+		for (String name : CAPTURE_CANDIDATES)
 		{
 			Path p = workDir.resolve(name);
 			if (Files.exists(p))
 				return p;
 		}
 		throw new IllegalStateException("Kein capture.(png|jpg|jpeg) im WorkDir gefunden: " + workDir);
+	}
+	
+	public List<String> getCandidates()
+	{
+		return CAPTURE_CANDIDATES;
 	}
 }

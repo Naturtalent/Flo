@@ -16,7 +16,7 @@ public class CameraRouterService implements CameraService
 {
 
 	@Inject
-	private PiCameraService piCamera;
+	private HttpCameraService piCamera;
 	@Inject
 	private LocalFileCameraService localCamera;
 

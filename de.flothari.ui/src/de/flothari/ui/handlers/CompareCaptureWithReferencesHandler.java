@@ -20,6 +20,9 @@ import org.opencv.imgproc.Imgproc;
 
 import de.flothari.ui.settings.AppSettings;
 
+/**
+ * Programmlogik im Handler (nicht mehr relevant ?)
+ */
 public class CompareCaptureWithReferencesHandler {
 
     @Inject private UISynchronize ui;

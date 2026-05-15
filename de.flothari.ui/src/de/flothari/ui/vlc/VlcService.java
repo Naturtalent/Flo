@@ -61,7 +61,7 @@ public class VlcService
 		// App-Verzeichnis (dort liegt später capture.png)
 		AppSettings s = new AppSettings();
 		workDir = s.getWorkDir();
-		String audioDev = new AppSettings().getAudioDeviceName();		
+		String audioDev = new AppSettings().getVideoDeviceName();		
 
 		List<String> cmd = new ArrayList<>();
 		cmd.add(vlcExe);

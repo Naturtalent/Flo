@@ -16,6 +16,11 @@ import de.flothari.ui.domain.MatchResult;
 import de.flothari.ui.services.RecognitionService;
 import de.flothari.ui.settings.AppSettings;
 
+/**
+ * Implementiert das Interface Bilderkennung (recognition) 
+ * mit der opencv Bibliothek. 
+ * 
+ */
 @Creatable
 @Singleton
 public class OpenCvRecognitionService implements RecognitionService
@@ -34,6 +39,7 @@ public class OpenCvRecognitionService implements RecognitionService
 			throw new IllegalArgumentException("Capture-Datei existiert nicht: " + captureFile);
 		}
 
+		// Verzeichnisse der Referenzbilder aus Settings
 		Path workDir = new AppSettings().getWorkDir();
 		Path refDir = workDir.resolve("ref_bilder");
 
